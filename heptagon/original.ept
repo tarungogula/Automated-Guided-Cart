@@ -1,0 +1,130 @@
+const kp : int = 1
+const ki : int = 100
+const kd : int = 10000
+
+
+
+node main(sen0, sen1, sen2, sen3, sen4: int) returns (v_l, v_r, dir: int)
+var sen: int^5;
+a0,a1,a2,a3,a4 : bool;
+b0,b1,b2,b3,b4 : bool;
+(* last count:int=0; *)
+
+
+
+let
+     sen = [sen0, sen1, sen2, sen3, sen4];
+
+     a0 = if(sen0 > 650) then true else false;
+     a1 = if(sen1 > 800) then true else false;
+     a2 = if(sen2 > 800) then true else false;
+     a3 = if(sen3 > 800) then true else false;
+     a4 = if(sen4 > 650) then true else false;
+     
+	 b0 = if(sen0 < 800) then true else false;
+     b1 = if(sen1 < 800) then true else false;
+     b2 = if(sen2 < 800) then true else false;
+     b3 = if(sen3 < 800) then true else false;
+     b4 = if(sen4 < 800) then true else false;
+     
+     automaton
+			
+     
+     	state Forward
+     	  do dir = 1;
+     	     v_l = 30;
+     	     v_r = 30;
+     	     
+     	  unless  ((a0 )  ) continue SharpLeft
+     	  |	((a4 )  ) continue SharpRight
+     	  |	((a1) and not(a3 or a4) ) then PIDFollower
+     	  |	((a3) and not(a0 or a1) ) then PIDFollower
+     	  
+     	
+      state PIDFollower 
+      
+       var error,error_integral,error_derivative,temp_value,pid_value: int;
+       do
+        error= sen3 - sen1;
+     		error_integral = 0 -> (pre(error_integral) + error);
+     		error_derivative = error - (0 -> pre(error));
+     		temp_value = ((error/kp) + (error_integral/ki) + (error_derivative/kd));
+     		pid_value=if(temp_value< 0) then -20 else 20 ;
+			v_l = if pid_value = 0 then 30 else 30 - pid_value;
+     		v_r = if pid_value = 0 then 30 else 30 + pid_value;
+			dir= if pid_value=0 then 1 else if v_l < v_r then 2 else 3;
+     		
+        unless ((a0 )  ) continue SharpLeft 
+     	  |	((a4 )  ) continue SharpRight 
+     	  |	a2 then Forward
+
+     
+	  state SharpLeft
+	     do dir = 4;
+	      	v_l = 100;
+	  	    v_r =  100;
+			(* count = 0 -> pre(count) + 1; *)
+	  	
+	  	until	( (( sen0 + sen1 + sen2 + sen3 + sen4 ) > 4500)  ) then Black
+		| ((a4 and a3)  ) then SharpRight 
+	  	|	((a3) and not(a0 or a1) ) then PIDFollower
+	  	|	((a1) and not(a3 or a4) ) then PIDFollower 
+	  	|	a2 then Forward
+	  
+	  state SharpRight
+	     do dir = 5;
+	  		v_l =  100;
+	  		v_r =  100;
+			(* count = 0 -> pre(count) + 1;	 *)
+	  	
+	  	until ( (( sen0 + sen1 + sen2 + sen3 + sen4 ) > 4500)   ) then Black
+		| ((a4 and a3)) then SharpLeft
+		|	((a3) and not(a0 or a1) ) then PIDFollower
+	  	|	((a1) and not(a3 or a4) ) then PIDFollower 
+	  	|	a2 then Forward
+	  
+   
+	state Black
+	 do
+	 automaton
+	 	state Temp
+			do
+			dir = 8;
+			v_l = 0;
+			v_r = 20;
+			unless b1 or b2 or b3 then B_Forward
+
+		state B_Forward
+			do
+			dir = 9;
+     	     v_l = 30;
+     	     v_r = 30;
+
+			unless b1 and not( b3 or b4) then B_PIDFollower
+			| b3 and not( b0 or b1) then B_PIDFollower
+
+	state B_PIDFollower 
+      
+       var error,error_integral,error_derivative,temp_value,pid_value: int;
+       do
+	   dir =10;
+        error= sen3 - sen1;
+     		error_integral = 0 -> (pre(error_integral) + error);
+     		error_derivative = error - (0 -> pre(error));
+     		temp_value = ((error/kp) + (error_integral/ki) + (error_derivative/kd));
+     		pid_value=if(temp_value< 0) then -25 else 25 ;
+			v_r = if pid_value = 0 then 30 else 35 - pid_value;
+     		v_l = if pid_value = 0 then 30 else 35 + pid_value;
+
+			unless b2 then B_Forward
+			
+		
+	
+		end	  
+   
+	end
+tel
+
+
+
+

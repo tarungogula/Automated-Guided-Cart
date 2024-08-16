@@ -1,0 +1,162 @@
+type st = St_W_PIDFollower|St_B_PIDFollower
+const kp = 1
+const ki = 100
+const kd = 10000
+node main(sen0 : int; sen1 : int; sen2 : int; sen3 : int; sen4 : int;
+           switch_line : bool; threshold : bool)
+returns (v_l : int; v_r : int; dir : int)
+var b4 : bool; b3 : bool; b2 : bool; b1 : bool; b0 : bool; sum_all : int;
+    a4 : bool; a3 : bool; a2 : bool; a1 : bool; a0 : bool; pnr : bool;
+    nr : bool; r : bool; ns : st; v : bool; v_1 : bool; v_2 : bool;
+    v_3 : bool; v_4 : bool; v_5 : int; v_6 : int; v_7 : int; v_8 : bool;
+    v_9 : bool; v_10 : bool; v_11 : bool; v_12 : bool; ck : st;
+    v_l_St_W_PIDFollower : int; v_r_St_W_PIDFollower : int;
+    dir_St_W_PIDFollower : int; ns_St_W_PIDFollower : st;
+    nr_St_W_PIDFollower : bool; v_l_St_B_PIDFollower : int;
+    v_r_St_B_PIDFollower : int; dir_St_B_PIDFollower : int;
+    ns_St_B_PIDFollower : st; nr_St_B_PIDFollower : bool; pid_value : int;
+    temp_value : int; error_derivative : int; error_integral : int;
+    error : int; v_35 : bool; v_36 : bool; v_37 : bool; v_38 : int;
+    v_39 : int; v_40 : int; v_41 : int; v_42 : int; v_43 : bool; v_44 : bool;
+    v_45 : int; v_46 : int; v_47 : bool; v_48 : bool; v_49 : int; v_50 : int;
+    v_51 : int; v_52 : int; v_53 : int; v_54 : bool; v_55 : bool; v_56 : int;
+    v_57 : bool; v_58 : int; v_59 : bool; v_60 : int; v_61 : int; v_62 : int;
+    v_63 : int; v_64 : int; v_65 : bool; v_66 : bool; v_67 : bool;
+    v_68 : bool; v_69 : int; v_70 : int; pid_value_1 : int;
+    temp_value_1 : int; error_derivative_1 : int; error_integral_1 : int;
+    error_1 : int; v_13 : int; v_14 : int; v_15 : int; v_16 : int;
+    v_17 : int; v_18 : bool; v_19 : bool; v_20 : int; v_21 : int;
+    v_22 : bool; v_23 : bool; v_24 : int; v_25 : int; v_26 : int; v_27 : int;
+    v_28 : bool; v_29 : bool; v_30 : int; v_31 : bool; v_32 : int;
+    v_33 : bool; v_34 : int;
+let
+  r = pnr;
+  pnr = false fby nr;
+  ck = St_W_PIDFollower fby ns;
+  dir_St_W_PIDFollower = if v_66 then 4 else v_70;
+  v_70 = if v_67 then 2 else v_69;
+  v_69 = if v_68 then 3 else 1;
+  v_68 = ((sen4 when St_W_PIDFollower(ck)) > 900);
+  v_67 = ((sen0 when St_W_PIDFollower(ck)) > 900);
+  v_66 = (v_65 & (threshold when St_W_PIDFollower(ck)));
+  v_65 = (v_64 > 4000);
+  v_64 = (v_63 + (sen4 when St_W_PIDFollower(ck)));
+  v_63 = (v_62 + (sen3 when St_W_PIDFollower(ck)));
+  v_62 = (v_61 + (sen2 when St_W_PIDFollower(ck)));
+  v_61 =
+    ((sen0 when St_W_PIDFollower(ck)) + (sen1 when St_W_PIDFollower(ck)));
+  v_r_St_W_PIDFollower = if v_59 then 45 else v_60;
+  v_60 = (45 + pid_value);
+  v_59 = (pid_value = 0);
+  v_l_St_W_PIDFollower = if v_57 then 45 else v_58;
+  v_58 = (45 - pid_value);
+  v_57 = (pid_value = 0);
+  pid_value = if v_54 then ~-(25) else v_56;
+  v_56 = if v_55 then 25 else temp_value;
+  v_55 = (temp_value > 25);
+  v_54 = (temp_value < ~-(25));
+  temp_value = (v_53 + error_derivative);
+  v_53 = (v_51 + v_52);
+  v_52 = (error_integral / 5000);
+  v_51 = (error / 2);
+  error_derivative = (error - v_50);
+  v_50 = if v_48 then 0 else v_49;
+  v_49 = pre error;
+  v_48 = if v_47 then true else (r when St_W_PIDFollower(ck));
+  v_47 = true fby false;
+  error_integral = if v_44 then 0 else v_46;
+  v_46 = (v_45 + error);
+  v_45 = pre error_integral;
+  v_44 = if v_43 then true else (r when St_W_PIDFollower(ck));
+  v_43 = true fby false;
+  error = (v_41 - v_42);
+  v_42 = ((sen1 when St_W_PIDFollower(ck)) / 10);
+  v_41 = (v_39 + v_40);
+  v_40 = ((sen3 when St_W_PIDFollower(ck)) / 10);
+  v_39 = (v_38 / 10);
+  v_38 =
+    ((sen0 when St_W_PIDFollower(ck)) - (sen4 when St_W_PIDFollower(ck)));
+  nr_St_W_PIDFollower = if v_37 then true else false;
+  ns_St_W_PIDFollower = if v_37 then St_B_PIDFollower else St_W_PIDFollower;
+  v_37 = (v_36 & (switch_line when St_W_PIDFollower(ck)));
+  v_36 = (v_35 or (b3 when St_W_PIDFollower(ck)));
+  v_35 = ((b1 when St_W_PIDFollower(ck)) or (b2 when St_W_PIDFollower(ck)));
+  v_l_St_B_PIDFollower = if v_33 then 40 else v_34;
+  v_34 = (40 + pid_value_1);
+  v_33 = (pid_value_1 = 0);
+  v_r_St_B_PIDFollower = if v_31 then 40 else v_32;
+  v_32 = (40 - pid_value_1);
+  v_31 = (pid_value_1 = 0);
+  pid_value_1 = if v_28 then ~-(25) else v_30;
+  v_30 = if v_29 then 25 else temp_value_1;
+  v_29 = (temp_value_1 > 25);
+  v_28 = (temp_value_1 < ~-(25));
+  temp_value_1 = (v_27 + error_derivative_1);
+  v_27 = (error_1 + v_26);
+  v_26 = (error_integral_1 / 5000);
+  error_derivative_1 = (error_1 - v_25);
+  v_25 = if v_23 then 0 else v_24;
+  v_24 = pre error_1;
+  v_23 = if v_22 then true else (r when St_B_PIDFollower(ck));
+  v_22 = true fby false;
+  error_integral_1 = if v_19 then 0 else v_21;
+  v_21 = (v_20 + error_1);
+  v_20 = pre error_integral_1;
+  v_19 = if v_18 then true else (r when St_B_PIDFollower(ck));
+  v_18 = true fby false;
+  error_1 = (v_16 - v_17);
+  v_17 = ((sen1 when St_B_PIDFollower(ck)) / 10);
+  v_16 = (v_14 + v_15);
+  v_15 = ((sen3 when St_B_PIDFollower(ck)) / 10);
+  v_14 = (v_13 / 10);
+  v_13 =
+    ((sen0 when St_B_PIDFollower(ck)) - (sen4 when St_B_PIDFollower(ck)));
+  dir_St_B_PIDFollower = 5;
+  nr_St_B_PIDFollower = false;
+  ns_St_B_PIDFollower = St_B_PIDFollower;
+  v_l =
+    merge ck
+      (St_B_PIDFollower -> v_l_St_B_PIDFollower)
+      (St_W_PIDFollower -> v_l_St_W_PIDFollower);
+  v_r =
+    merge ck
+      (St_B_PIDFollower -> v_r_St_B_PIDFollower)
+      (St_W_PIDFollower -> v_r_St_W_PIDFollower);
+  dir =
+    merge ck
+      (St_B_PIDFollower -> dir_St_B_PIDFollower)
+      (St_W_PIDFollower -> dir_St_W_PIDFollower);
+  ns =
+    merge ck
+      (St_B_PIDFollower -> ns_St_B_PIDFollower)
+      (St_W_PIDFollower -> ns_St_W_PIDFollower);
+  nr =
+    merge ck
+      (St_B_PIDFollower -> nr_St_B_PIDFollower)
+      (St_W_PIDFollower -> nr_St_W_PIDFollower);
+  b4 = if v_12 then true else false;
+  v_12 = (sen4 < 800);
+  b3 = if v_11 then true else false;
+  v_11 = (sen3 < 800);
+  b2 = if v_10 then true else false;
+  v_10 = (sen2 < 800);
+  b1 = if v_9 then true else false;
+  v_9 = (sen1 < 800);
+  b0 = if v_8 then true else false;
+  v_8 = (sen0 < 800);
+  sum_all = (v_7 + sen4);
+  v_7 = (v_6 + sen3);
+  v_6 = (v_5 + sen2);
+  v_5 = (sen0 + sen1);
+  a4 = if v_4 then true else false;
+  v_4 = (sen4 > 950);
+  a3 = if v_3 then true else false;
+  v_3 = (sen3 > 900);
+  a2 = if v_2 then true else false;
+  v_2 = (sen2 > 900);
+  a1 = if v_1 then true else false;
+  v_1 = (sen1 > 900);
+  a0 = if v then true else false;
+  v = (sen0 > 850)
+tel
+

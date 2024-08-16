@@ -1,0 +1,86 @@
+const kp : int = 1
+const ki : int = 100
+const kd : int = 10000
+
+
+
+node main(sen0, sen1, sen2, sen3, sen4: int;switch_line,threshold :bool) returns (v_l, v_r, dir: int)
+var b0,b1,b2,b3,b4 : bool;
+
+let
+
+     (* computing boolean values of sensors *)
+	b0 = if(sen0 < 800) then true else false;
+     b1 = if(sen1 < 800) then true else false;
+     b2 = if(sen2 < 800) then true else false;
+     b3 = if(sen3 < 800) then true else false;
+     b4 = if(sen4 < 800) then true else false;
+     
+     automaton
+
+      (* White line PID follower *)
+      state W_PIDFollower
+       var error,error_integral,error_derivative,temp_value,pid_value: int;
+       do
+
+               (* calculating error *)
+               error = (sen0-sen4)/10 + sen3/10 - sen1/10;
+
+               (* calculating error integral *)
+     		error_integral = 0 -> (pre(error_integral) + error);
+
+               (* calculating error derivate *)
+     		error_derivative = error - (0 -> pre(error));
+
+               (* calculating pid value *)
+     		temp_value = ((error/2) + (error_integral/5000) + (error_derivative));
+
+               (* limiting pid range *)
+     		pid_value=if(temp_value< -25) then -25 else if(temp_value > 25) then 25 else temp_value ; 
+
+               (* computing motor velocities *)
+			v_l = if pid_value = 0 then 45 else 45 - pid_value;
+     		v_r = if pid_value = 0 then 45 else 45 + pid_value;
+
+			(* dir = if( sen0 >900 and sen4>900 and (sen1 < 850 or sen3 < 850)) then 4 else if sen0 > 900 then 2 else if sen4>900 then 3 else 1; *)
+
+               (* condition for transition *)
+			dir = if(( (sen0 + sen1 + sen2 + sen3 + sen4) > 4000) and threshold) then 4 else if sen0 > 900 then 2 else if sen4>900 then 3 else 1;
+          
+          until ((b1 or b2 or b3 ) and switch_line) then B_PIDFollower
+               
+
+          (* Black line PID follower *)
+          state B_PIDFollower 
+          var error,error_integral,error_derivative,temp_value,pid_value: int;
+               do
+	          dir = 5;
+
+               (* calculating error *)
+               error = (sen0-sen4)/10 + sen3/10 - sen1/10;
+
+               (* calculating error integral *)
+     		error_integral = 0 -> (pre(error_integral) + error);
+
+               (* calculating error derivate *)
+     		error_derivative = error - (0 -> pre(error));
+
+                (* calculating pid value *)
+     		temp_value = ((error) + (error_integral/5000) + (error_derivative));
+
+               (* limiting pid range *)
+     		pid_value=if(temp_value< -25) then -25 else if(temp_value > 25) then 25 else temp_value ; 
+
+               (* computing motor velocities *)
+			v_r = if pid_value = 0 then 40 else 40 - pid_value;
+     		v_l = if pid_value = 0 then 40 else 40 + pid_value;
+
+               
+		  
+     end
+
+tel
+     		
+     
+        
+
